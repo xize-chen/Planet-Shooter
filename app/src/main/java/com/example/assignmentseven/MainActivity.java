@@ -8,23 +8,35 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Target target;
+    private Ball ball;
+    private Bouncer bouncer;
     private Orbiter[] orbiters = new Orbiter[2];
     private ArrayList<Circle> objects;
-    private float x,y;
+    private float width, height;
+    private float xTarget, yTarget;
+    private float xStart, yStart;
 
     public class GraphicView extends View{
         Paint paint = new Paint();
+        GestureDetector detector;
 
         public GraphicView(Context context) {
             super(context);
-            x = (float) (this.getResources().getDisplayMetrics().widthPixels/2.0);
-            y = (float) (this.getResources().getDisplayMetrics().heightPixels/5.0);
+            detector = new GestureDetector(context, new myGestureListener());
+            width = (float) (this.getResources().getDisplayMetrics().widthPixels);
+            height = (float) (this.getResources().getDisplayMetrics().heightPixels);
+            xTarget = width/2;
+            yTarget = height/6;
+            xStart = width/2;
+            yStart = height*19/20;
         }
         @Override
         protected void onDraw(Canvas canvas) {
@@ -33,9 +45,59 @@ public class MainActivity extends AppCompatActivity {
                 paint.setColor(getColor(object.color));
                 canvas.drawCircle(object.x, object.y, object.radius, paint);
                 object.move();
+                checkState();
             }
             invalidate();
         }
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+
+            /*switch(event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    if(isBallClicked(event.getX(),event.getY()))
+                        ballFlag = true;
+                        ball.x = event.getX();
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    if(ballFlag)
+                       ball.x = event.getX();
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    if(ballFlag) {
+                        ball.x = event.getX();
+                        ballFlag = false;
+                    }
+                    return true;
+
+            }*/
+            if(detector.onTouchEvent(event)){
+                return true;
+            }
+            return super.onTouchEvent(event);
+
+        }
+        class myGestureListener extends GestureDetector.SimpleOnGestureListener{
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return isBallClicked(e.getX(), e.getY());
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if(velocityY < -250){
+                    ball.x = e2.getX();
+                    ball.y = Math.max(e2.getY(), e1.getY() - 6 * ball.radius);
+                    ball.turnOn(velocityX,velocityY);
+                }
+                return true;
+            }
+            @Override
+            public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
+                ball.x -= distanceX;
+                return true;
+            }
+        }
+
 
     }
     @Override
@@ -62,11 +124,41 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setup() {
         objects = new ArrayList<Circle>();
-        target = new Target(x,y,R.color.colorPrimary);
+        target = new Target(xTarget, yTarget,R.color.colorPrimary);
         objects.add(target);
-        orbiters[0] = new Orbiter(x,y,R.color.colorAccent);
+        orbiters[0] = new Orbiter(xTarget, yTarget,R.color.colorAccent);
         objects.add(orbiters[0]);
-        orbiters[1] = new Orbiter(x,y,R.color.colorAccent);
+        orbiters[1] = new Orbiter(xTarget, yTarget,R.color.colorAccent);
         objects.add(orbiters[1]);
+        bouncer = new Bouncer(xTarget,yTarget*3,R.color.colorPrimaryDark);
+        objects.add(bouncer);
+        ball = new Ball(xStart, yStart, R.color.colorPrimary,width);
+        objects.add(ball);
+    }
+    private boolean isBallClicked(float x, float y){
+        float yD = Math.abs(y - ball.y);
+        float xD = Math.abs(x - ball.x);
+        return (Math.hypot(yD, xD) < (ball.radius +10));
+    }
+    private boolean isCollision(Circle object){
+        float yD = Math.abs(object.y - ball.y);
+        float xD = Math.abs(object.x - ball.x);
+        return (Math.hypot(yD, xD) <= (ball.radius + object.radius));
+    }
+    private void checkState(){
+        if(ball.y > height*2)
+            reStart();
+        if(isCollision(orbiters[0]))
+            ball.moveOut(height);
+        if(isCollision(orbiters[1]))
+            ball.moveOut(height);
+        if(isCollision(bouncer))
+            ball.touchBouncer(bouncer.x,bouncer.y);
+    }
+    private void reStart(){
+        ball.delete();
+        objects.remove(ball);
+        ball = new Ball(xStart, yStart, R.color.colorPrimary,width);
+        objects.add(ball);
     }
 }

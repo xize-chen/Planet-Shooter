@@ -117,13 +117,13 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
-        ConstraintLayout layout = (ConstraintLayout) findViewById(R.id.cl_main);
+        ConstraintLayout layout = findViewById(R.id.cl_main);
         layout.addView(new GraphicView(this));
         setup();
 
     }
     private void setup() {
-        objects = new ArrayList<Circle>();
+        objects = new ArrayList<>();
         target = new Target(xTarget, yTarget,R.color.colorPrimary);
         objects.add(target);
         orbiters[0] = new Orbiter(xTarget, yTarget,R.color.colorAccent);
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         if(isCollision(orbiters[1]))
             ball.moveOut(height);
         if(isCollision(bouncer))
-            ball.touchBouncer(bouncer.x,bouncer.y);
+            ball.touchBouncer(bouncer.x,bouncer.y, bouncer.radius);
     }
     private void reStart(){
         ball.delete();

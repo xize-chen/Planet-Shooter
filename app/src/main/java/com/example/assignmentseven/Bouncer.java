@@ -6,7 +6,7 @@ public class Bouncer extends Circle {
         x = xB;
         y = yB;
         color = c;
-        radius = 150;
+        radius = 300;
     }
     @Override
     public void move() {

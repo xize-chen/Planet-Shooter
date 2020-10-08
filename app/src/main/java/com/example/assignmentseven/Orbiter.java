@@ -6,7 +6,7 @@ public class Orbiter extends Circle {
     private static int index = 0;
     public Orbiter(float xC, float yC, int c){
         super();
-        radius = 50;
+        radius = 40;
         color = c;
         xCenter = xC;
         yCenter = yC;

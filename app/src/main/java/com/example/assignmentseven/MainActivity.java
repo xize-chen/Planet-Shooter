@@ -7,10 +7,15 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -23,6 +28,24 @@ public class MainActivity extends AppCompatActivity {
     private float width, height;
     private float xTarget, yTarget;
     private float xStart, yStart;
+    private boolean flag = true;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private int counter = 0;
+    //private TextView counter;
+
+    private SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            bouncer.update(sensorEvent.values[0]);
+            //xAcceleration = sensorEvent.values[0];
+            //yAcceleration = sensorEvent.values[1];
+            //updateBall();
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) { }
+    };
 
     public class GraphicView extends View{
         Paint paint = new Paint();
@@ -85,15 +108,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 if(velocityY < -250){
-                    ball.x = e2.getX();
-                    ball.y = Math.max(e2.getY(), e1.getY() - 6 * ball.radius);
+                    ball.x = e1.getX();
+                    //ball.y = Math.max(e2.getY(), e1.getY() - 6 * ball.radius);
+                    /*double v = Math.hypot(velocityX,velocityY);
+                    double d = Math.hypot(e2.getX()-e1.getX(), e2.getY()-e1.getY());
+                    float xV = (float) ((e2.getX()-e1.getX())/d*v);
+                    float yV = (float) ((e2.getY()-e1.getY())/d*v);
+                    ball.turnOn(xV,yV);*/
                     ball.turnOn(velocityX,velocityY);
+                    flag = false;
                 }
                 return true;
             }
             @Override
             public boolean onScroll (MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
-                ball.x -= distanceX;
+                if(flag){
+                    if(isBallClicked(e2.getX(),e2.getY()))
+                        ball.x -= distanceX;
+                }
                 return true;
             }
         }
@@ -119,26 +151,42 @@ public class MainActivity extends AppCompatActivity {
 
         ConstraintLayout layout = findViewById(R.id.cl_main);
         layout.addView(new GraphicView(this));
+        //counter = findViewById(R.id.counter);
+        //counter.setY(yTarget);
+        //counter.setX(xTarget);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         setup();
 
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(sensorEventListener,accelerometer, SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(sensorEventListener,accelerometer);
+    }
     private void setup() {
         objects = new ArrayList<>();
-        target = new Target(xTarget, yTarget,R.color.colorPrimary);
+        target = new Target(xTarget, yTarget,R.color.color3);
         objects.add(target);
-        orbiters[0] = new Orbiter(xTarget, yTarget,R.color.colorAccent);
+        orbiters[0] = new Orbiter(xTarget, yTarget,R.color.color1);
         objects.add(orbiters[0]);
-        orbiters[1] = new Orbiter(xTarget, yTarget,R.color.colorAccent);
+        orbiters[1] = new Orbiter(xTarget, yTarget,R.color.color1);
         objects.add(orbiters[1]);
-        bouncer = new Bouncer(xTarget,yTarget*3,R.color.colorPrimaryDark);
+        bouncer = new Bouncer(xTarget,yTarget*4,R.color.color2,width);
         objects.add(bouncer);
-        ball = new Ball(xStart, yStart, R.color.colorPrimary,width);
+        ball = new Ball(xStart, yStart, R.color.color3,width);
         objects.add(ball);
     }
     private boolean isBallClicked(float x, float y){
         float yD = Math.abs(y - ball.y);
         float xD = Math.abs(x - ball.x);
-        return (Math.hypot(yD, xD) < (ball.radius +10));
+        return (Math.hypot(yD, xD) < (ball.radius +60));
     }
     private boolean isCollision(Circle object){
         float yD = Math.abs(object.y - ball.y);
@@ -154,11 +202,16 @@ public class MainActivity extends AppCompatActivity {
             ball.moveOut(height);
         if(isCollision(bouncer))
             ball.touchBouncer(bouncer.x,bouncer.y, bouncer.radius);
+        if(isCollision(target)){
+            counter++;
+            ball.moveOut(height);
+        }
     }
     private void reStart(){
         ball.delete();
         objects.remove(ball);
-        ball = new Ball(xStart, yStart, R.color.colorPrimary,width);
+        ball = new Ball(xStart, yStart, R.color.color3,width);
         objects.add(ball);
+        flag = true;
     }
 }

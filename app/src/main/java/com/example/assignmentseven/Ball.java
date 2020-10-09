@@ -1,33 +1,49 @@
 package com.example.assignmentseven;
 
 public class Ball extends Circle {
-    private static final float GRAVITY = 20;
+    private static final float GRAVITY = 0.4f;
     private static final int INTERVAL = 100;
     private boolean isStart = false;
-    private float boundary;
     public Ball(float xB, float yB, int c, float b){
         super();
         x = xB;
         y = yB;
         color = c;
-        radius = 50;
+        radius = 60;
         boundary = b - radius;
     }
 
     @Override
     public void move() {
         if(isStart){
-            x += xVelocity/INTERVAL;
-            y += yVelocity/INTERVAL;
+            float ySpeed = yVelocity;
+            float yDistance = ySpeed + GRAVITY/2;
             yVelocity += GRAVITY;
+            float xSpeed = xVelocity;
+            float xDistance;
+            if(x>(boundary*3/4)){
+                xDistance = xSpeed - ACCELERATION/4;
+                xVelocity -= ACCELERATION/2;
+            }else if(x<(boundary/4)){
+                xDistance = xSpeed + ACCELERATION/4;
+                xVelocity += ACCELERATION/2;
+            }else xDistance = xSpeed;
+
+
+            x += xDistance;
+            y += yDistance;
+
             rebound(x,y);
         }
     }
     public void turnOn(float xV, float yV){
-        xVelocity = xV;
-        if(yV>-3000)
-            yVelocity = yV;
-        else yVelocity = -3000;
+        if(Math.abs(xV/INTERVAL)>40)
+            xVelocity = 40*(xV/Math.abs(xV));
+        else xVelocity = xV/INTERVAL;
+
+        if(yV/INTERVAL>-40)
+            yVelocity = yV/INTERVAL;
+        else yVelocity = -40;
         isStart = true;
     }
     private void rebound(float xCurrent, float yCurrent){
@@ -53,7 +69,7 @@ public class Ball extends Circle {
     }
     public void moveOut(float height){
         y = (float) (1.5*height);
-        yVelocity = 400;
+        yVelocity = 15;
     }
     /*public void touchBouncer(float xBouncer, float yBouncer, int r){
         double angle = Math.atan(Math.abs(yBouncer - y) / Math.abs(xBouncer - x));

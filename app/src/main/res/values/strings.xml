@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">AssignmentSeven</string>
-    <string name="background">background</string>
+    <string name="game_background">Background</string>
+    <string name="start_picture">START</string>
+    <string name="start_play">   START PLAY   </string>
+    <string name="score_background">Score</string>
+    <string name="back">BACK</string>
+    <string name="high_score">HIGH SCORE</string>
+    <string name="planet_shooter">PLANET SHOOTER</string>
+    <string name="developers">Developer: Xize chen, Qi zhang. Version = \"1.0\"</string>
 </resources>

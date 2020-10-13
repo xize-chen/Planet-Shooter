@@ -8,4 +8,6 @@
     <color name="color3">#847545</color>
     <color name="color4">#8e8cd8</color>
     <color name="color5">#ef6950</color>
+    <color name="start_button">#FF0000</color>
+    <color name="start_title">#FFDF00</color>
 </resources>

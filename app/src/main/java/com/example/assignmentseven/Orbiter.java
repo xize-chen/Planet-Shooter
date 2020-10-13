@@ -13,7 +13,10 @@ public class Orbiter extends Circle {
         if (index == 0){
             degree = 0;
             index++;
-        }else degree = 180;
+        }else {
+            degree = 180;
+            index--;
+        }
         x = (float) (Math.cos(angle(degree)) * 140 + xCenter);
         y = (float) (Math.sin(angle(degree)) * 140 + yCenter);
     }

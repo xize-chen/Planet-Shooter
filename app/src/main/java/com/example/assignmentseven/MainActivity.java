@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.hardware.Sensor;
@@ -31,8 +32,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean flag = true;
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private int counter = 0;
-    //private TextView counter;
+    private int counter;
+    private int rounds;
+    private TextView scorePanel;
+    private boolean isStart = true;
 
     private SensorEventListener sensorEventListener = new SensorEventListener() {
         @Override
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onAccuracyChanged(Sensor sensor, int i) { }
     };
+
 
     public class GraphicView extends View{
         Paint paint = new Paint();
@@ -70,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
                 object.move();
                 checkState();
             }
-            invalidate();
+            if(isStart)
+                invalidate();
         }
         @Override
         public boolean onTouchEvent(MotionEvent event) {
@@ -141,19 +146,12 @@ public class MainActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.hide();
 
-        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-        getWindow().getDecorView().setSystemUiVisibility(uiOptions);
-
         ConstraintLayout layout = findViewById(R.id.cl_main);
         layout.addView(new GraphicView(this));
         //counter = findViewById(R.id.counter);
         //counter.setY(yTarget);
         //counter.setX(xTarget);
+        scorePanel = (TextView) findViewById(R.id.scorePanel);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         setup();
@@ -161,6 +159,13 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     protected void onResume() {
+        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        getWindow().getDecorView().setSystemUiVisibility(uiOptions);
         super.onResume();
         sensorManager.registerListener(sensorEventListener,accelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
@@ -182,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
         objects.add(bouncer);
         ball = new Ball(xStart, yStart, R.color.color3,width);
         objects.add(ball);
+        counter = 0;
+        scorePanel.setText(Integer.toString(counter));
+        rounds = 5;
     }
     private boolean isBallClicked(float x, float y){
         float yD = Math.abs(y - ball.y);
@@ -194,8 +202,17 @@ public class MainActivity extends AppCompatActivity {
         return (Math.hypot(yD, xD) <= (ball.radius + object.radius));
     }
     private void checkState(){
-        if(ball.y > height*2)
-            reStart();
+        if(ball.y > height*2){
+            if(--rounds == 0){
+                isStart = false;
+                Scoreboard scoreboard = Scoreboard.getInstance();
+                scoreboard.update(counter);
+                Intent startScore = new Intent(this, ScoreActivity.class);
+                startActivity(startScore);
+            }else
+                reStart();
+        }
+
         if(isCollision(orbiters[0]))
             ball.moveOut(height);
         if(isCollision(orbiters[1]))
@@ -204,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
             ball.touchBouncer(bouncer.x,bouncer.y, bouncer.radius);
         if(isCollision(target)){
             counter++;
+            scorePanel.setText(Integer.toString(counter));
             ball.moveOut(height);
         }
     }

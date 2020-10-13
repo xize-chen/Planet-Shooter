@@ -2,38 +2,44 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cl_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ScoreActivity">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/game_background"
+        android:contentDescription="@string/score_background"
         android:scaleType="centerCrop"
-        android:src="@drawable/background" />
+        android:src="@drawable/score_background" />
 
-    <TextView
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/guideline"
-        android:textAlignment="center"
-        android:textColor="@color/start_title"
+        app:layout_constraintTop_toTopOf="@id/guideline2"
+        android:layout_marginRight="80dp"
+        android:layout_marginLeft="80dp"
+        android:backgroundTint="#77000000"
+        android:padding="20dp"
+        android:text="@string/back"
+        android:textColor="@color/start_button"
         android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="50sp"
-        android:id="@+id/scorePanel"
-        />
+        android:onClick="onclickBack" />
 
-
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline2"
+        android:id="@+id/ranking" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.3" />
+        app:layout_constraintGuide_percent="0.75" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

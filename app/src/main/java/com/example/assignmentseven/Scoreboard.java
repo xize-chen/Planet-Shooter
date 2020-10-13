@@ -2,15 +2,14 @@ package com.example.assignmentseven;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.PriorityQueue;
 
 public class Scoreboard {
-    private PriorityQueue<Integer> queue;
+    private ArrayList<Integer> queue;
     private int thisTime = 100;
     private static Scoreboard instance = new Scoreboard();
 
     private Scoreboard(){
-        queue = new PriorityQueue<>(5, Collections.<Integer>reverseOrder());
+        queue = new ArrayList<>();
     }
 
     public static Scoreboard getInstance(){
@@ -27,15 +26,22 @@ public class Scoreboard {
             printer.add(first);
         }
         printer.add("RANKING LIST");
-        String[] output = new String[printer.size() + queue.size()];
+        String[] output;
+        if(queue.size()<=5)
+            output = new String[printer.size() + queue.size()];
+        else output = new String[printer.size() + 5];
         String[] p = new String[printer.size()];
         p = printer.toArray(p);
-        Integer[] q = new Integer[queue.size()];
-        if(queue.peek() != null)
-            q = queue.toArray(q);
         System.arraycopy(p, 0, output, 0, p.length);
-        for(int i=0; i<q.length; i++){
-            output[p.length+i] = Integer.toString(q[i]);
+        Integer[] q;
+        if(!queue.isEmpty()){
+            q = new Integer[queue.size()];
+            Collections.sort(queue);
+            Collections.reverse(queue);
+            q = queue.toArray(q);
+            for(int i=0; i<q.length & i<5; i++){
+                output[p.length+i] = Integer.toString(q[i]);
+            }
         }
         thisTime = 100;
         return output;

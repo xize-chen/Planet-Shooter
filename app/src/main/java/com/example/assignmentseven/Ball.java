@@ -36,6 +36,7 @@ public class Ball extends Circle {
             rebound(x,y);
         }
     }
+
     public void turnOn(float xV, float yV){
         if(Math.abs(xV/INTERVAL)>40)
             xVelocity = 40*(xV/Math.abs(xV));
@@ -46,6 +47,7 @@ public class Ball extends Circle {
         else yVelocity = -40;
         isStart = true;
     }
+
     private void rebound(float xCurrent, float yCurrent){
         if(xCurrent < radius){
             x = radius;
@@ -61,37 +63,19 @@ public class Ball extends Circle {
         }
 
     }
+
     public void delete(){
         x = -500;
         y = -500;
         xVelocity = 0;
         yVelocity = 0;
     }
+
     public void moveOut(float height){
         y = (float) (1.5*height);
         yVelocity = 15;
     }
-    /*public void touchBouncer(float xBouncer, float yBouncer, int r){
-        double angle = Math.atan(Math.abs(yBouncer - y) / Math.abs(xBouncer - x));
-        double cos = Math.cos(angle);
-        double sin = Math.sin(angle);
-        double vC = - (xVelocity * cos + yVelocity * sin);
-        double vU = xVelocity * sin + yVelocity * cos;
-        double absX = (r + radius) * cos;
-        double absY = (r + radius) * sin;
-        if (x >= xBouncer)
-            x = (float) (xBouncer + absX +10);
-        else x = (float) (xBouncer - absX -10);
-        if (y >= yBouncer)
-            y = (float) (yBouncer + absY +10);
-        else y = (float) (yBouncer - absY -10);
-        xVelocity = (float) (vC * cos + vU * sin);
-        yVelocity = (float) (vU * cos + vC * sin);
-        if(-100<xVelocity & xVelocity<100)
-            xVelocity*=2;
-        if(-100<yVelocity & yVelocity<100)
-            yVelocity*=2;
-    }*/
+
     public void touchBouncer (float xBouncer, float yBouncer, int r){
         double distance = Math.hypot((xBouncer - x),(yBouncer - y));
         double Sin = (yBouncer - y) / distance;

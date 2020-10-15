@@ -41,9 +41,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
             bouncer.update(sensorEvent.values[0]);
-            //xAcceleration = sensorEvent.values[0];
-            //yAcceleration = sensorEvent.values[1];
-            //updateBall();
         }
 
         @Override
@@ -80,24 +77,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
 
-            /*switch(event.getAction()){
-                case MotionEvent.ACTION_DOWN:
-                    if(isBallClicked(event.getX(),event.getY()))
-                        ballFlag = true;
-                        ball.x = event.getX();
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    if(ballFlag)
-                       ball.x = event.getX();
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    if(ballFlag) {
-                        ball.x = event.getX();
-                        ballFlag = false;
-                    }
-                    return true;
-
-            }*/
             if(detector.onTouchEvent(event)){
                 return true;
             }
@@ -114,12 +93,6 @@ public class MainActivity extends AppCompatActivity {
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 if(velocityY < -250){
                     ball.x = e1.getX();
-                    //ball.y = Math.max(e2.getY(), e1.getY() - 6 * ball.radius);
-                    /*double v = Math.hypot(velocityX,velocityY);
-                    double d = Math.hypot(e2.getX()-e1.getX(), e2.getY()-e1.getY());
-                    float xV = (float) ((e2.getX()-e1.getX())/d*v);
-                    float yV = (float) ((e2.getY()-e1.getY())/d*v);
-                    ball.turnOn(xV,yV);*/
                     ball.turnOn(velocityX,velocityY);
                     flag = false;
                 }
@@ -148,9 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
         ConstraintLayout layout = findViewById(R.id.cl_main);
         layout.addView(new GraphicView(this));
-        //counter = findViewById(R.id.counter);
-        //counter.setY(yTarget);
-        //counter.setX(xTarget);
         scorePanel = (TextView) findViewById(R.id.scorePanel);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -189,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         objects.add(ball);
         counter = 0;
         scorePanel.setText(Integer.toString(counter));
-        rounds = 5;
+        rounds = 10;
     }
     private boolean isBallClicked(float x, float y){
         float yD = Math.abs(y - ball.y);
